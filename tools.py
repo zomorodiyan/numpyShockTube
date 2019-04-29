@@ -1,22 +1,24 @@
 # Translation of G. Mellema's Roe Solver
 
 import math
+import numpy as np
 
-def Roe_solve(dr, dt, gamma, vol, state, flux, meshr, icntl):
+def Roe_solve(dr, dt, vol, state, flux, gamma=1.4):
     """ dr      spatial step
         dt      time step
-        gamma   adiabatic index
         vol     volume factor for 3-D problem
         state   (rho, rho*u, e) -- input
         flux    flux at cell boundaries -- output
         meshr   number of interior points
-        icntl   diagnostic -- bad if != 0
+        #   icntl   diagnostic -- bad if != 0
+        gamma   adiabatic index
     """
     tiny = 1e-30
     sbpar1 = 2.0
     sbpar2 = 2.0
-
-    # allocate temporary arrays
+    meshr = state.shape[0]-2
+    vol = np.array(meshr + 2)
+    # allocate temporary arrays,    memory!!!
     fludif = [ [0.0] * 3 for i in range(meshr + 2) ]
     rsumr = [ 0.0 for i in range(meshr + 2) ]
     utilde = [ 0.0 for i in range(meshr + 2) ]
@@ -38,7 +40,7 @@ def Roe_solve(dr, dt, gamma, vol, state, flux, meshr, icntl):
     isb = [ [0] * 3 for i in range(meshr + 2) ]
 
     # initialize control variable to 0
-    icntl[0] = 0
+    icntl = 0
 
     # find parameter vector w
     for i in range(meshr + 2):
@@ -81,7 +83,7 @@ def Roe_solve(dr, dt, gamma, vol, state, flux, meshr, icntl):
             vsc[i] = math.sqrt(ssc[i])
         else:
             vsc[i] = math.sqrt(abs(ssc[i]))
-            icntl[0] += 1
+            icntl += 1
 
     # calculate the eigenvalues and projection coefficients for each eigenvector
     for i in range(1, meshr + 2):
@@ -185,4 +187,4 @@ def Roe_solve(dr, dt, gamma, vol, state, flux, meshr, icntl):
                 - ptest[i] * ptest[i])
             if (ptest[i] <= 0.0 or (dr * vol[i] * state[i][0] +
                     dt * (flux[i][0] - flux[i + 1][0])) <= 0.0):
-                icntl[0] += 1
+                icntl += 1
