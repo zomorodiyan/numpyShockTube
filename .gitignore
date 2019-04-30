@@ -11,3 +11,7 @@
 5-lax.data
 5-roe.data
 __pycache__/tools.cpython-37.pyc
+__pycache__/methods.cpython-37.pyc
+__pycache__/methods_shocktube.cpython-37.pyc
+__pycache__/methods_stream.cpython-37.pyc
+__pycache__/stream_methods.cpython-37.pyc
